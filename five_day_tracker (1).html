@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Day Focus Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: #f0f0f0;
+        }
+        
+        .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .dashboard-card.green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .dashboard-card.orange {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .dashboard-card.blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .card-title {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .card-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .card-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .sales-section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .sales-input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+        }
+        
+        .input-field {
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .bookings-list {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .booking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .booking-info {
+            flex: 1;
+        }
+        
+        .booking-customer {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        
+        .booking-date {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .booking-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .add-booking-btn, .save-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .days-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .day-tab {
+            padding: 12px 24px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .day-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .day-tab.completed {
+            background: #10b981;
+            color: white;
+        }
+        
+        .day-progress {
+            font-size: 10px;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+        
+        .day-content {
+            display: none;
+        }
+        
+        .day-content.active {
+            display: block;
+        }
+        
+        .activity-section {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .activity-section.non-negotiable {
+            border-left: 4px solid #dc2626;
+            background: #fef2f2;
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .non-negotiable-badge {
+            background: #dc2626;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .time-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .task-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .task-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+        
+        .task-text {
+            flex: 1;
+            color: #333;
+        }
+        
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+        
+        .resources-box {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .resources-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .resources-list {
+            list-style: none;
+            font-size: 13px;
+            color: #78350f;
+        }
+        
+        .resources-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .resources-list li:before {
+            content: "📖";
+            position: absolute;
+            left: 0;
+        }
+        
+        .progress-section {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        .progress-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .progress-bar {
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .daily-progress-bar {
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .daily-progress-fill {
+            height: 100%;
+            background: #10b981;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        
+        .notes-section {
+            margin-top: 20px;
+        }
+        
+        .notes-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .future-plans {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .reset-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .call-day-item {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .call-day-date {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .call-day-stats {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-brand">📊 Focus Tracker Pro</div>
+        <div class="nav-links">
+            <button class="nav-link active" onclick="showPage('home')">Home</button>
+            <button class="nav-link" onclick="showPage('tracker')">Daily Tracker</button>
+            <button class="nav-link" onclick="showPage('calls')">Call Tracking</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- HOME PAGE -->
+        <div id="homePage" class="page active">
+            <h1>Dashboard Overview</h1>
+            <p class="subtitle">Track your progress across all areas</p>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-title">Focus Tracker</div>
+                    <div class="card-value" id="homeTasksCompleted">0</div>
+                    <div class="card-label">Tasks Completed</div>
+                </div>
+                
+                <div class="dashboard-card green">
+                    <div class="card-title">Days Completed</div>
+                    <div class="card-value" id="homeDaysCompleted">0/5</div>
+                    <div class="card-label">Streak: <span id="homeStreak">0</span> days</div>
+                </div>
+                
+                <div class="dashboard-card orange">
+                    <div class="card-title">Total Leads</div>
+                    <div class="card-value" id="homeTotalLeads">0</div>
+                    <div class="card-label">Active prospects</div>
+                </div>
+                
+                <div class="dashboard-card blue">
+                    <div class="card-title">Bookings</div>
+                    <div class="card-value" id="homeTotalBookings">0</div>
+                    <div class="card-label">Customers scheduled</div>
+                </div>
+            </div>
+
+            <div class="sales-section">
+                <div class="section-title">📅 Upcoming Bookings</div>
+                <div class="bookings-list" id="homeBookingsList">
+                    <p style="text-align: center; color: #999; padding: 20px;">No bookings scheduled yet. Add them in Call Tracking!</p>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-header">5-Day Focus Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="homeOverallProgress">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRACKER PAGE -->
+        <div id="trackerPage" class="page">
+            <h1>5-Day Pre-Intensive Focus Tracker</h1>
+            <p class="subtitle">Dec 25-29, 2024 • Stay focused on what's working</p>
+            
+            <div class="days-container" id="dayTabs"></div>
+            <div id="dayContents"></div>
+            
+            <div class="progress-section">
+                <div class="progress-header">Overall Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="overallProgress">0%</div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="daysCompleted">0</div>
+                        <div class="stat-label">Days Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="tasksCompleted">0</div>
+                        <div class="stat-label">Tasks Done</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="currentStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="future-plans">
+                <div class="section-title">📋 Plans After 5 Days</div>
+                <textarea class="notes-textarea" id="futurePlans" placeholder="What do you want to focus on after the intensive ends?"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="save-btn" onclick="saveFuturePlans()">Save Plans</button>
+                <button class="reset-btn" onclick="resetProgress()">Reset Progress</button>
+            </div>
+        </div>
+
+        <!-- CALL TRACKING PAGE -->
+        <div id="callsPage" class="page">
+            <h1>Daily Call Tracking</h1>
+            <p class="subtitle">Track your sales calls and customer interactions</p>
+
+            <div class="sales-section">
+                <div class="section-title">📞 Log Today's Activity</div>
+                <div class="sales-input-grid">
+                    <div class="input-group">
+                        <label class="input-label">Date</label>
+                        <input type="date" id="callDate" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Total Calls Made</label>
+                        <input type="number" id="callsMade" class="input-field" value="0" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">New Leads</label>
+                        <input type="number" id="leadsGenerated" class="input-field" value="0" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Follow-ups Done</label>
+                        <input type="number" id="followupsCompleted" class="input-field" value="0" min="0">
+                    </div>
+                </div>
+                
+                <div class="section-title" style="margin-top: 30px;">📅 Add Customer Booking</div>
+                <div class="sales-input-grid">
+                    <div class="input-group">
+                        <label class="input-label">Customer Name</label>
+                        <input type="text" id="customerName" class="input-field" placeholder="Customer name">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Booking Date & Time</label>
+                        <input type="datetime-local" id="bookingDateTime" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="button-group" style="justify-content: flex-start;">
+                    <button class="save-btn" onclick="saveCallData()">Save Call Data</button>
+                    <button class="add-booking-btn" onclick="addBooking()">Add Booking</button>
+                </div>
+            </div>
+
+            <div class="sales-section">
+                <div class="section-title">📊 Call History</div>
+                <div id="callHistoryList"></div>
+            </div>
+
+            <div class="sales-section">
+                <div class="section-title">📅 All Bookings</div>
+                <div class="bookings-list" id="allBookingsList">
+                    <p style="text-align: center; color: #999;">No bookings yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const schedule = [
+            {day: 1, date: "Dec 25", activities: [{title: "Morning Devotion", time: "15-20 min", nonNegotiable: true, tasks: ["Read a short passage or devotional", "Pray - thank God, confess, ask for guidance", "Set intention for the day"]}, {title: "Morning Work Session", time: "Until lunch", tasks: ["Focus on sales work", "Notice what's working well", "Notice what's challenging", "Stay present and engaged"]}, {title: "Afternoon Scripture Study", time: "40-50 min", scripture: "Mark 1:1-11 (Who is Jesus)", tasks: ["Read Mark 1:1-11 carefully, multiple times", "Write down 2-3 key insights about Jesus' identity", "Note any questions or confusions", "Pray and reflect on what this means for you personally"], resources: ["Bible Study Commentary (if you have one)", "Study Bible notes on Mark 1", "Cross-references to Old Testament prophecies", "Online: BibleHub, Blue Letter Bible for word studies"]}, {title: "Evening", time: "Flexible", tasks: ["Be present with family", "Rest and recharge", "Brief reflection on the day"]}]},
+            {day: 2, date: "Dec 26", activities: [{title: "Morning Devotion", time: "15-20 min", nonNegotiable: true, tasks: ["Read devotional or Psalm", "Prayer time", "Commit the day to God"]}, {title: "Morning Work Session", time: "Until lunch", tasks: ["Sales work with focus", "Apply one thing you noticed yesterday", "Keep observing patterns", "Note any improvements"]}, {title: "Afternoon Scripture Study", time: "40-50 min", scripture: "Mark 1:21-34 (Jesus' Authority)", tasks: ["Read Mark 1:21-34 carefully", "List examples of Jesus' authority you notice", "What does this authority look like in action?", "Reflect: What does this authority mean for your life?"], resources: ["Commentary on Mark's Gospel", "Study notes on Jesus' teaching authority", "Compare with other Gospel accounts", "Look up 'authority' in Greek (exousia)"]}, {title: "Evening", time: "Flexible", tasks: ["Quality time with family", "Rest well", "Quick journal about insights from Mark"]}]},
+            {day: 3, date: "Dec 27", activities: [{title: "Morning Devotion", time: "15-20 min", nonNegotiable: true, tasks: ["Scripture reading", "Prayer for wisdom and understanding", "Ask God to speak through today's study"]}, {title: "Morning Work Session", time: "Until lunch", tasks: ["Regular sales work", "Notice patterns in your approach", "What's one thing you're doing well consistently?", "Write it down for later"]}, {title: "Afternoon Scripture Study", time: "40-50 min", scripture: "Luke 19:10 (Why Jesus Came)", tasks: ["Read Luke 19:1-10 for full context", "Write down Jesus' mission statement (v.10)", "Study the Zacchaeus story - what does it reveal?", "Consider: How does this apply to your leadership calling?"], resources: ["Commentary on Luke 19", "Study the word 'seek' and 'save' in context", "Read parallel accounts in other Gospels", "Research tax collectors in Jesus' time"]}, {title: "Evening", time: "Flexible", tasks: ["Family time", "Start mentally preparing for intensive", "Pray about the course starting Sunday"]}]},
+            {day: 4, date: "Dec 28", activities: [{title: "Morning Devotion", time: "15-20 min", nonNegotiable: true, tasks: ["Devotional reading", "Prayer for the upcoming intensive", "Ask for readiness to learn deeply"]}, {title: "Morning Work Session", time: "Until lunch", tasks: ["Sales work", "Review this week's observations", "Write down 1-2 things to focus on after intensive", "Finish any urgent tasks before course starts"]}, {title: "Afternoon Scripture Study", time: "40-50 min", scripture: "Mark 15:33-39 (The Cross)", tasks: ["Read Mark 15:33-39 slowly and prayerfully", "Write down what happened and why it matters", "Study the centurion's declaration - why significant?", "Reflect on the cross and your own life"], resources: ["Commentary on the crucifixion narrative", "Study the temple curtain tearing (v.38)", "Compare all four Gospel accounts of crucifixion", "Research Roman centurions and their significance"]}, {title: "Evening - Preparation", time: "1-2 hours", tasks: ["Organize materials for tomorrow's class", "Check class requirements/schedule if available", "Have conversation with wife about next 10 days", "Prepare mentally and spiritually", "Get good rest before intensive starts"]}]},
+            {day: 5, date: "Dec 29", activities: [{title: "Morning Devotion", time: "15-20 min", nonNegotiable: true, tasks: ["Prayer for the intensive course", "Ask God for wisdom and understanding", "Commit to learning deeply, not just completing"]}, {title: "Morning", time: "Until lunch", tasks: ["Review your notes from all Mark and Luke passages", "Write down key themes you've noticed", "Essential work only today", "Keep energy for evening class"]}, {title: "Afternoon", time: "After lunch", tasks: ["Light meal", "Rest and prepare mentally", "Review any class materials", "Pray for the session ahead"]}, {title: "Evening Class - First Session", time: "5:30-8pm", tasks: ["Arrive early, be prepared", "Engage fully in the session", "Take detailed notes", "Note any assignments for tomorrow", "Connect with classmates if possible"]}]}
+        ];
+
+        let currentDay = 1;
+        let progress = loadProgress();
+        let currentPage = 'home';
+
+        function loadProgress() {
+            const saved = localStorage.getItem('fiveDayProgress');
+            return saved ? JSON.parse(saved) : {callHistory: [], bookings: []};
+        }
+
+        function saveProgress() {
+            localStorage.setItem('fiveDayProgress', JSON.stringify(progress));
+            updateStats();
+            updateAllDayProgress();
+            updateHomeStats();
+        }
+
+        function showPage(page) {
+            currentPage = page;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            document.getElementById(page + 'Page').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (page === 'home') updateHomeStats();
+            if (page === 'calls') {
+                renderCallHistory();
+                renderAllBookings();
+                document.getElementById('callDate').valueAsDate = new Date();
+            }
+        }
+
+        function updateHomeStats() {
+            let totalTasks = 0, completedTasks = 0, daysComp = 0;
+            
+            schedule.forEach(day => {
+                if (isDayCompleted(day.day)) daysComp++;
+                day.activities.forEach((act, ai) => {
+                    act.tasks.forEach((t, ti) => {
+                        totalTasks++;
+                        if (progress[`day${day.day}-act${ai}-task${ti}`]) completedTasks++;
+                    });
+                });
+            });
+            
+            document.getElementById('homeTasksCompleted').textContent = completedTasks;
+            document.getElementById('homeDaysCompleted').textContent = daysComp + '/5';
+            document.getElementById('homeStreak').textContent = calculateStreak();
+            
+            let totalLeads = 0, totalBookings = (progress.bookings || []).length;
+            (progress.callHistory || []).forEach(call => {
+                totalLeads += parseInt(call.leads) || 0;
+            });
+            
+            document.getElementById('homeTotalLeads').textContent = totalLeads;
+            document.getElementById('homeTotalBookings').textContent = totalBookings;
+            
+            const pct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            document.getElementById('homeOverallProgress').style.width = pct + '%';
+            document.getElementById('homeOverallProgress').textContent = pct + '%';
+            
+            renderHomeBookings();
+        }
+
+        function renderHomeBookings() {
+            const list = document.getElementById('homeBookingsList');
+            const bookings = (progress.bookings || []).sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
+            
+            if (!bookings.length) {
+                list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">No bookings scheduled yet</p>';
+                return;
+            }
+            
+            list.innerHTML = bookings.slice(0, 5).map((b, i) => `
+                <div class="booking-item">
+                    <div class="booking-info">
+                        <div class="booking-customer">${b.customer}</div>
+                        <div class="booking-date">${new Date(b.datetime).toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveCallData() {
+            const date = document.getElementById('callDate').value;
+            const calls = document.getElementById('callsMade').value;
+            const leads = document.getElementById('leadsGenerated').value;
+            const followups = document.getElementById('followupsCompleted').value;
+            
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+            
+            if (!progress.callHistory) progress.callHistory = [];
+            
+            const existingIndex = progress.callHistory.findIndex(c => c.date === date);
+            const callData = {date, calls, leads, followups};
+            
+            if (existingIndex >= 0) {
+                progress.callHistory[existingIndex] = callData;
+            } else {
+                progress.callHistory.push(callData);
+            }
+            
+            saveProgress();
+            alert('Call data saved!');
+            renderCallHistory();
+        }
+
+        function addBooking() {
+            const customer = document.getElementById('customerName').value;
+            const datetime = document.getElementById('bookingDateTime').value;
+            
+            if (!customer || !datetime) {
+                alert('Please enter customer name and booking date/time');
+                return;
+            }
+            
+            if (!progress.bookings) progress.bookings = [];
+            progress.bookings.push({customer, datetime});
+            
+            document.getElementById('customerName').value = '';
+            document.getElementById('bookingDateTime').value = '';
+            
+            saveProgress();
+            alert('Booking added!');
+            renderAllBookings();
+        }
+
+        function deleteBooking(index) {
+            if (confirm('Delete this booking?')) {
+                progress.bookings.splice(index, 1);
+                saveProgress();
+                renderAllBookings();
+                renderHomeBookings();
+            }
+        }
+
+        function renderCallHistory() {
+            const list = document.getElementById('callHistoryList');
+            const history = (progress.callHistory || []).sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            if (!history.length) {
+                list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">No call data logged yet</p>';
+                return;
+            }
+            
+            list.innerHTML = history.map(call => `
+                <div class="call-day-item">
+                    <div class="call-day-date">${new Date(call.date).toLocaleDateString()}</div>
+                    <div class="call-day-stats">
+                        📞 Calls Made: ${call.calls} | 
+                        🎯 Leads: ${call.leads} | 
+                        📋 Follow-ups: ${call.followups}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAllBookings() {
+            const list = document.getElementById('allBookingsList');
+            const bookings = (progress.bookings || []).sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
+            
+            if (!bookings.length) {
+                list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">No bookings yet</p>';
+                return;
+            }
+            
+            list.innerHTML = bookings.map((b, i) => `
+                <div class="booking-item">
+                    <div class="booking-info">
+                        <div class="booking-customer">${b.customer}</div>
+                        <div class="booking-date">${new Date(b.datetime).toLocaleString()}</div>
+                    </div>
+                    <button class="booking-delete" onclick="deleteBooking(${i})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function initializeTabs() {
+            const tabsContainer = document.getElementById('dayTabs');
+            const contentsContainer = document.getElementById('dayContents');
+            
+            schedule.forEach(day => {
+                const tab = document.createElement('button');
+                tab.className = 'day-tab';
+                const dayProgress = getDayProgress(day.day);
+                tab.innerHTML = `Day ${day.day} (${day.date})<div class="day-progress">${dayProgress}%</div>`;
+                tab.onclick = () => switchDay(day.day);
+                
+                if (isDayCompleted(day.day)) tab.classList.add('completed');
+                tabsContainer.appendChild(tab);
+                
+                const content = document.createElement('div');
+                content.className = 'day-content';
+                content.id = `day${day.day}`;
+                content.innerHTML = generateDayContent(day);
+                contentsContainer.appendChild(content);
+            });
+            
+            const futurePlans = document.getElementById('futurePlans');
+            if (futurePlans) futurePlans.value = progress['futurePlans'] || '';
+            
+            switchDay(1);
+        }
+
+        function generateDayContent(day) {
+            let html = `<div class="progress-header">Today's Progress</div>
+                        <div class="daily-progress-bar">
+                            <div class="daily-progress-fill" id="dayProgress${day.day}">0%</div>
+                        </div>`;
+            
+            day.activities.forEach((activity, actIndex) => {
+                const isNonNeg = activity.nonNegotiable ? 'non-negotiable' : '';
+                html += `
+                    <div class="activity-section ${isNonNeg}">
+                        <div class="activity-header">
+                            <div class="activity-title">
+                                ${activity.title}
+                                ${activity.nonNegotiable ? '<span class="non-negotiable-badge">Non-Negotiable</span>' : ''}
+                            </div>
+                            <div class="time-badge">${activity.time}</div>
+                        </div>
+                        ${activity.scripture ? `<div style="color: #667eea; font-weight: 600; margin-bottom: 10px; font-size: 14px;">📖 ${activity.scripture}</div>` : ''}
+                        <ul class="task-list">
+                `;
+                
+                activity.tasks.forEach((task, taskIndex) => {
+                    const taskId = `day${day.day}-act${actIndex}-task${taskIndex}`;
+                    const isChecked = progress[taskId] || false;
+                    html += `
+                        <li class="task-item ${isChecked ? 'completed' : ''}" onclick="toggleTask('${taskId}')">
+                            <input type="checkbox" class="task-checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">
+                            <span class="task-text">${task}</span>
+                        </li>
+                    `;
+                });
+                
+                html += `</ul>`;
+                
+                if (activity.resources) {
+                    html += `<div class="resources-box">
+                            <div class="resources-title">📚 Recommended Commentaries & References</div>
+                            <ul class="resources-list">`;
+                    activity.resources.forEach(resource => {
+                        html += `<li>${resource}</li>`;
+                    });
+                    html += `</ul></div>`;
+                }
+                html += `</div>`;
+            });
+            
+            html += `<div class="notes-section">
+                    <div class="progress-header">Daily Notes & Reflections</div>
+                    <textarea class="notes-textarea" id="notes${day.day}" placeholder="What did you learn today? Scripture insights? Work observations?">${progress[`notes${day.day}`] || ''}</textarea>
+                </div>`;
+            
+            return html;
+        }
+
+        function switchDay(dayNum) {
+            currentDay = dayNum;
+            
+            document.querySelectorAll('.day-tab').forEach((tab, index) => {
+                tab.classList.remove('active');
+                if (index + 1 === dayNum) tab.classList.add('active');
+            });
+            
+            document.querySelectorAll('.day-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`day${dayNum}`).classList.add('active');
+            
+            updateDayProgressBar(dayNum);
+            
+            const notesArea = document.getElementById(`notes${dayNum}`);
+            if (notesArea) {
+                notesArea.oninput = () => {
+                    progress[`notes${dayNum}`] = notesArea.value;
+                    saveProgress();
+                };
+            }
+        }
+
+        function toggleTask(taskId) {
+            progress[taskId] = !progress[taskId];
+            saveProgress();
+            
+            const taskElement = event.currentTarget;
+            const checkbox = taskElement.querySelector('.task-checkbox');
+            
+            if (progress[taskId]) {
+                taskElement.classList.add('completed');
+                checkbox.checked = true;
+            } else {
+                taskElement.classList.remove('completed');
+                checkbox.checked = false;
+            }
+            
+            updateDayCompletion();
+            updateDayProgressBar(currentDay);
+        }
+
+        function getDayProgress(dayNum) {
+            const dayData = schedule.find(d => d.day === dayNum);
+            let totalTasks = 0, completedTasks = 0;
+            
+            dayData.activities.forEach((activity, actIndex) => {
+                activity.tasks.forEach((task, taskIndex) => {
+                    totalTasks++;
+                    const taskId = `day${dayNum}-act${actIndex}-task${taskIndex}`;
+                    if (progress[taskId]) completedTasks++;
+                });
+            });
+            
+            return totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        }
+
+        function updateDayProgressBar(dayNum) {
+            const percentage = getDayProgress(dayNum);
+            const progressBar = document.getElementById(`dayProgress${dayNum}`);
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+                progressBar.textContent = percentage + '%';
+            }
+        }
+
+        function updateAllDayProgress() {
+            schedule.forEach(day => {
+                updateDayProgressBar(day.day);
+                const tab = document.querySelectorAll('.day-tab')[day.day - 1];
+                if (tab) {
+                    const percentage = getDayProgress(day.day);
+                    const progressDiv = tab.querySelector('.day-progress');
+                    if (progressDiv) progressDiv.textContent = percentage + '%';
+                }
+            });
+        }
+
+        function isDayCompleted(dayNum) {
+            return getDayProgress(dayNum) === 100;
+        }
+
+        function updateDayCompletion() {
+            document.querySelectorAll('.day-tab').forEach((tab, index) => {
+                const dayNum = index + 1;
+                if (isDayCompleted(dayNum)) {
+                    tab.classList.add('completed');
+                } else {
+                    tab.classList.remove('completed');
+                }
+            });
+        }
+
+        function updateStats() {
+            let totalTasks = 0, completedTasks = 0, daysCompleted = 0;
+            
+            schedule.forEach(day => {
+                if (isDayCompleted(day.day)) daysCompleted++;
+                
+                day.activities.forEach((activity, actIndex) => {
+                    activity.tasks.forEach((task, taskIndex) => {
+                        totalTasks++;
+                        const taskId = `day${day.day}-act${actIndex}-task${taskIndex}`;
+                        if (progress[taskId]) completedTasks++;
+                    });
+                });
+            });
+            
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('overallProgress').style.width = percentage + '%';
+            document.getElementById('overallProgress').textContent = percentage + '%';
+            document.getElementById('daysCompleted').textContent = daysCompleted;
+            document.getElementById('tasksCompleted').textContent = completedTasks;
+            document.getElementById('currentStreak').textContent = calculateStreak();
+        }
+
+        function calculateStreak() {
+            let streak = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (isDayCompleted(i)) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        function saveFuturePlans() {
+            const futurePlansArea = document.getElementById('futurePlans');
+            progress['futurePlans'] = futurePlansArea.value;
+            saveProgress();
+            alert('Future plans saved! ✅');
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('fiveDayProgress');
+                location.reload();
+            }
+        }
+
+        initializeTabs();
+        updateStats();
+        updateAllDayProgress();
+        updateHomeStats();
+        document.getElementById('callDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
+                
